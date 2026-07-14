@@ -1,0 +1,622 @@
+/* ================================================================
+   如意国风科技蓝 — Modern UI Enhancement Layer (2025-2026)
+   Adds: glassmorphism, 3D transforms, glowing borders,
+   animated gradients, neumorphic accents, entrance animations,
+   particle effects, and micro-interactions.
+
+   Include AFTER theme.css in your import chain:
+   import './styles/theme.css';
+   import './styles/modern-enhancements.css';
+   ================================================================ */
+
+/* ===== EXTENDED CSS VARIABLES ===== */
+:root {
+  /* Glass surface transparency levels */
+  --glass-bg-strong: rgba(22, 33, 62, 0.75);
+  --glass-bg-medium: rgba(22, 33, 62, 0.55);
+  --glass-bg-light: rgba(22, 33, 62, 0.35);
+  --glass-blur: 20px;
+  --glass-blur-heavy: 28px;
+
+  /* Glow colors */
+  --glow-blue: rgba(59, 130, 246, 0.15);
+  --glow-gold: rgba(201, 169, 110, 0.1);
+  --glow-white: rgba(255, 255, 255, 0.05);
+
+  /* Neumorphic shadows */
+  --neo-shadow-dark: rgba(0, 0, 0, 0.35);
+  --neo-shadow-light: rgba(59, 130, 246, 0.06);
+  --neo-highlight: rgba(255, 255, 255, 0.03);
+
+  /* Animation speeds */
+  --anim-fast: 0.15s;
+  --anim-normal: 0.25s;
+  --anim-slow: 0.4s;
+  --anim-glacial: 0.6s;
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Z-index layers */
+  --z-particles: 0;
+  --z-content: 1;
+  --z-overlay: 10;
+  --z-sidebar: 99;
+  --z-header: 100;
+  --z-modal: 1000;
+}
+
+/* ===== REGISTER ANIMATABLE PROPERTIES ===== */
+@property --border-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@property --gradient-x {
+  syntax: '<percentage>';
+  initial-value: 10%;
+  inherits: false;
+}
+
+@property --gradient-y {
+  syntax: '<percentage>';
+  initial-value: 50%;
+  inherits: false;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TECHNIQUE #1: PREMIUM GLASSMORPHISM
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Glass card — replaces .ruyi-card for a modern frosted-glass look */
+.glass-card {
+  /* Layered backgrounds for depth */
+  background:
+    radial-gradient(
+      ellipse at 0% 0%,
+      rgba(59, 130, 246, 0.06) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse at 100% 100%,
+      rgba(201, 169, 110, 0.04) 0%,
+      transparent 50%
+    ),
+    var(--glass-bg-medium);
+
+  /* Frosted glass effect */
+  backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+
+  /* Glowing border — inner highlight + outer shadow */
+  border: 1px solid rgba(201, 169, 110, 0.12);
+  border-radius: 16px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 0 0 1px rgba(59, 130, 246, 0.08);
+
+  transition:
+    transform var(--anim-slow) var(--ease-spring),
+    border-color var(--anim-slow) var(--ease-spring),
+    box-shadow var(--anim-slow) var(--ease-spring);
+}
+
+.glass-card:hover {
+  border-color: rgba(201, 169, 110, 0.3);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 0 1px rgba(59, 130, 246, 0.15),
+    0 0 40px rgba(59, 130, 246, 0.06);
+  transform: translateY(-2px);
+}
+
+/* Glass header — frosted + subtle depth */
+.glass-header {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(15, 32, 39, 0.88) 0%,
+      rgba(22, 33, 62, 0.78) 100%
+    );
+  backdrop-filter: blur(var(--glass-blur-heavy)) saturate(200%);
+  -webkit-backdrop-filter: blur(var(--glass-blur-heavy)) saturate(200%);
+  border-bottom: 1px solid rgba(201, 169, 110, 0.1);
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.3),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.03);
+}
+
+/* Glass sidebar */
+.glass-sidebar {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(15, 32, 39, 0.92) 0%,
+      rgba(22, 33, 62, 0.78) 50%,
+      rgba(26, 26, 46, 0.88) 100%
+    );
+  backdrop-filter: blur(var(--glass-blur-heavy)) saturate(200%);
+  -webkit-backdrop-filter: blur(var(--glass-blur-heavy)) saturate(200%);
+  border-right: 1px solid rgba(201, 169, 110, 0.08);
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.2);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TECHNIQUE #2: ANIMATED GRADIENT MESH BACKGROUND
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Wrapper class for the animated background — add to top-level layout div */
+.gradient-mesh-bg {
+  position: relative;
+  background: var(--color-primary);
+}
+
+/* Animated orbs behind content */
+.gradient-mesh-bg::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: var(--z-particles);
+  opacity: 0.4;
+
+  /* Multiple animated gradient orbs */
+  background:
+    radial-gradient(
+      ellipse 800px 600px at var(--gradient-x) 20%,
+      rgba(59, 130, 246, 0.08) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 600px 500px at 80% calc(100% - var(--gradient-x)),
+      rgba(15, 52, 96, 0.12) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 500px 400px at 30% 60%,
+      rgba(201, 169, 110, 0.04) 0%,
+      transparent 60%
+    );
+
+  animation: gradientShift 20s ease-in-out infinite alternate;
+}
+
+@keyframes gradientShift {
+  0% {
+    --gradient-x: 10%;
+  }
+  100% {
+    --gradient-x: 90%;
+  }
+}
+
+/* Light ray beams (tech-forward feel) */
+.light-rays {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: var(--z-particles);
+  opacity: 0.04;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 200px,
+      rgba(59, 130, 246, 0.3) 200px,
+      rgba(59, 130, 246, 0.3) 201px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 300px,
+      rgba(201, 169, 110, 0.2) 300px,
+      rgba(201, 169, 110, 0.2) 301px
+    );
+  animation: lightRayDrift 40s linear infinite;
+}
+
+@keyframes lightRayDrift {
+  0% {
+    transform: translate(-5%, -5%) rotate(0deg);
+  }
+  100% {
+    transform: translate(5%, 5%) rotate(5deg);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TECHNIQUE #3: 3D PERSPECTIVE CARD TILT
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Container establishes 3D perspective */
+.tilt-card {
+  perspective: 800px;
+  transform-style: preserve-3d;
+}
+
+/* Inner element that actually tilts (controlled by JS) */
+.tilt-card-inner {
+  position: relative;
+  transition: transform 0.1s ease-out;
+  transform-style: preserve-3d;
+  will-change: transform;
+  border-radius: inherit;
+  overflow: hidden;
+}
+
+/* Glow trail that follows cursor */
+.tilt-card-inner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    400px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(59, 130, 246, 0.12),
+    rgba(201, 169, 110, 0.06) 30%,
+    transparent 60%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.tilt-card-inner:hover::after {
+  opacity: 1;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TECHNIQUE #4: ANIMATED GLOWING BORDERS
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Rotating conic-gradient border via pseudo-element */
+.glow-border-card {
+  position: relative;
+  border-radius: 16px;
+  background: var(--color-surface);
+  overflow: hidden;
+}
+
+.glow-border-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px; /* border thickness */
+  background: conic-gradient(
+    from var(--border-angle, 0deg),
+    transparent 0%,
+    rgba(201, 169, 110, 0.6) 15%,
+    rgba(59, 130, 246, 0.5) 35%,
+    transparent 50%,
+    transparent 70%,
+    rgba(201, 169, 110, 0.3) 85%,
+    transparent 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: borderSpin 8s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes borderSpin {
+  to {
+    --border-angle: 360deg;
+  }
+}
+
+/* Gold accent variant (for Chinese-style elements like the banner) */
+.glow-border-gold::before {
+  background: conic-gradient(
+    from var(--border-angle, 0deg),
+    transparent 0%,
+    rgba(201, 169, 110, 0.8) 20%,
+    transparent 40%,
+    transparent 60%,
+    rgba(201, 169, 110, 0.4) 80%,
+    transparent 100%
+  );
+}
+
+/* Ping/pulse animation on hover */
+@keyframes statPulse {
+  0%,
+  100% {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.05),
+      0 0 0 0 rgba(59, 130, 246, 0);
+  }
+  50% {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 0 20px 5px rgba(59, 130, 246, 0.08);
+  }
+}
+
+.glow-border-card:hover {
+  animation: statPulse 3s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TECHNIQUE #5: NEUMORPHIC GOLD ACCENTS (Jade/Carved Aesthetic)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Raised element — like a carved button */
+.neo-gold-raised {
+  background: linear-gradient(
+    145deg,
+    rgba(22, 33, 62, 0.9) 0%,
+    rgba(26, 26, 46, 0.95) 100%
+  );
+  border-radius: 12px;
+  border: none;
+  box-shadow:
+    4px 4px 8px var(--neo-shadow-dark),
+    -2px -2px 6px var(--neo-shadow-light),
+    inset 0 1px 0 var(--neo-highlight);
+  transition:
+    all var(--anim-normal) var(--ease-spring);
+}
+
+.neo-gold-raised:hover {
+  box-shadow:
+    6px 6px 12px var(--neo-shadow-dark),
+    -3px -3px 8px var(--neo-shadow-light),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  transform: translateY(-1px);
+}
+
+.neo-gold-raised:active {
+  box-shadow:
+    inset 3px 3px 6px var(--neo-shadow-dark),
+    inset -1px -1px 3px var(--neo-shadow-light),
+    1px 1px 2px rgba(255, 255, 255, 0.02);
+  transform: translateY(1px);
+}
+
+/* Pressed-in state — for active sidebar items */
+.neo-gold-pressed {
+  background: linear-gradient(
+    145deg,
+    rgba(15, 32, 39, 0.95) 0%,
+    rgba(22, 33, 62, 0.9) 100%
+  );
+  box-shadow:
+    inset 3px 3px 6px var(--neo-shadow-dark),
+    inset -1px -1px 3px var(--neo-shadow-light),
+    1px 1px 2px rgba(255, 255, 255, 0.02);
+  color: var(--color-gold);
+}
+
+/* Seal-impression style — for avatar / key circular elements */
+.neo-gold-seal {
+  position: relative;
+  background: linear-gradient(145deg, #1a1a2e 0%, #16213e 100%);
+  border-radius: 50%;
+  box-shadow:
+    6px 6px 14px rgba(0, 0, 0, 0.4),
+    -2px -2px 8px rgba(201, 169, 110, 0.08),
+    inset 1px 1px 2px rgba(255, 255, 255, 0.03);
+  border: 1.5px solid rgba(201, 169, 110, 0.25);
+  transition:
+    box-shadow var(--anim-normal) var(--ease-spring),
+    border-color var(--anim-normal) var(--ease-spring);
+}
+
+.neo-gold-seal:hover {
+  border-color: rgba(201, 169, 110, 0.5);
+  box-shadow:
+    6px 6px 14px rgba(0, 0, 0, 0.4),
+    -2px -2px 10px rgba(201, 169, 110, 0.12),
+    inset 1px 1px 2px rgba(255, 255, 255, 0.04),
+    0 0 16px rgba(201, 169, 110, 0.1);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TECHNIQUE #6: ENTRANCE + SCROLL-TRIGGERED REVEAL ANIMATIONS
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Card rise-up reveal */
+@keyframes cardReveal {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.96);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+.animate-card-reveal {
+  animation: cardReveal var(--anim-glacial) var(--ease-spring) both;
+}
+
+/* Staggered delays — assign to cards 1..N */
+.delay-1 { animation-delay: 0.05s; }
+.delay-2 { animation-delay: 0.10s; }
+.delay-3 { animation-delay: 0.15s; }
+.delay-4 { animation-delay: 0.20s; }
+.delay-5 { animation-delay: 0.25s; }
+.delay-6 { animation-delay: 0.30s; }
+.delay-7 { animation-delay: 0.35s; }
+.delay-8 { animation-delay: 0.40s; }
+
+/* Section title slide-in with gold glow */
+@keyframes titleSlide {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+    text-shadow: 0 0 40px rgba(201, 169, 110, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+    text-shadow: 0 0 20px rgba(201, 169, 110, 0.15);
+  }
+}
+
+.animate-title {
+  animation: titleSlide 0.7s var(--ease-spring) both;
+}
+
+/* Scroll reveal states */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(24px) scale(0.98);
+  filter: blur(3px);
+  transition:
+    opacity var(--anim-glacial) var(--ease-spring),
+    transform var(--anim-glacial) var(--ease-spring),
+    filter var(--anim-glacial) var(--ease-spring);
+}
+
+.scroll-revealed {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TECHNIQUE #7: MICRO-INTERACTIONS — RIPPLE, SHIMMER, PARTICLES
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Gold shimmer sweep on hover */
+@keyframes goldShimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.btn-gold-shimmer {
+  background: linear-gradient(
+    110deg,
+    rgba(201, 169, 110, 0.05) 0%,
+    rgba(201, 169, 110, 0.05) 40%,
+    rgba(201, 169, 110, 0.2) 50%,
+    rgba(201, 169, 110, 0.05) 60%,
+    rgba(201, 169, 110, 0.05) 100%
+  );
+  background-size: 200% 100%;
+  transition:
+    background var(--anim-normal),
+    border-color var(--anim-normal),
+    color var(--anim-normal);
+}
+
+.btn-gold-shimmer:hover {
+  animation: goldShimmer 1.5s ease-in-out infinite;
+  border-color: rgba(201, 169, 110, 0.4);
+  color: var(--color-gold);
+}
+
+/* Click ripple effect */
+.ripple-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(201, 169, 110, 0.35),
+    transparent 70%
+  );
+  transform: scale(0);
+  animation: rippleBurst 0.7s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes rippleBurst {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* Floating ambient particles (CSS-only, uses child <span> elements) */
+@keyframes floatUp {
+  0% {
+    opacity: 0;
+    transform: translateY(100vh) scale(0) rotate(0deg);
+  }
+  10% {
+    opacity: 0.5;
+  }
+  90% {
+    opacity: 0.2;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10vh) scale(1) rotate(360deg);
+  }
+}
+
+.ambient-particle {
+  position: fixed;
+  pointer-events: none;
+  z-index: var(--z-particles);
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--color-gold);
+  animation: floatUp 7s ease-in infinite;
+}
+
+.ambient-particle.blue {
+  background: rgba(59, 130, 246, 0.7);
+  animation-duration: 9s;
+  width: 2px;
+  height: 2px;
+}
+
+/* Subtle scale bounce on click */
+@keyframes clickBounce {
+  0% { transform: scale(1); }
+  40% { transform: scale(0.94); }
+  70% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+.click-bounce:active {
+  animation: clickBounce 0.3s var(--ease-bounce);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   UTILITY: FOCUS + ACTIVE STATES (accessibility + polish)
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Focus ring with gold glow */
+*:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
