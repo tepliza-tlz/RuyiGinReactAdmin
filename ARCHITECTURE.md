@@ -2,7 +2,8 @@
 
 > **Design target:** A reusable React admin shell template. Copy to a new repo, change one folder, rebuild any admin system.
 
----
+---<img width="1912" height="917" alt="image" src="https://github.com/user-attachments/assets/37a3fd4b-c740-4dff-8383-797ff5daed48" />
+
 
 ## 1. Current State Audit
 
